@@ -348,6 +348,12 @@ button {
   margin-right: 0.6rem;
 }
 
+.not-found {
+  margin-top: 80px;
+  margin-right: 50px;
+  margin-left: 50px !important;
+}
+
 /* Landing Page */
 .landing {
   margin: 0;
