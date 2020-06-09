@@ -32,6 +32,19 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
+// @route     GET api/profile
+// @desc      Get all profiles
+// @access    Public
+router.get('/', async (req, res) => {
+  try {
+    const profiles = await Profile.find().populate('user', ['name', 'avatar']);
+    res.json(profiles);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
 // @route     POST api/profile
 // @desc      Create or update user profile
 // @access    Private
@@ -63,104 +76,67 @@ router.post(
       linkedin
     } = req.body;
 
-    const profileFields = {
-      user: req.user.id,
-      company,
-      location,
-      website: website === '' ? '' : normalize(website, { forceHttps: true }),
-      bio,
-      skills: Array.isArray(skills)
-        ? skills
-        : skills.split(',').map((skill) => ' ' + skill.trim()),
-      status,
-      githubusername
-    };
+    // Build profile object
 
-    // Build social object and add to profileFields
-    const socialfields = { youtube, twitter, instagram, linkedin, facebook };
+    const profileFields = {};
 
-    for (const [key, value] of Object.entries(socialfields)) {
-      if (value.length > 0)
-        socialfields[key] = normalize(value, { forceHttps: true });
+    profileFields.user = req.user.id;
+    if (company) profileFields.company = company;
+    if (website)
+      profileFields.website = normalize(website, { forceHttps: true });
+    if (location) profileFields.location = location;
+    if (bio) profileFields.bio = bio;
+    if (status) profileFields.status = status;
+    if (githubusername) profileFields.githubusername = githubusername;
+    if (skills) {
+      console.log(skills);
+      if (Array.isArray(skills)) {
+        profileFields.skills = skills;
+      } else {
+        // when the skills is 1 string and we need to convert it to array
+        profileFields.skills = skills.split(',').map((skill) => skill.trim());
+      }
     }
-    profileFields.social = socialfields;
+
+    // Build social object
+    profileFields.social = {};
+    if (youtube)
+      profileFields.social.youtube = normalize(youtube, { forceHttps: true });
+    if (twitter)
+      profileFields.social.twitter = normalize(twitter, { forceHttps: true });
+    if (facebook)
+      profileFields.social.facebook = normalize(facebook, { forceHttps: true });
+    if (linkedin)
+      profileFields.social.linkedin = normalize(linkedin, { forceHttps: true });
+    if (instagram)
+      profileFields.social.instagram = normalize(instagram, {
+        forceHttps: true
+      });
 
     try {
-      // Using upsert option (creates new doc if no match is found):
-      let profile = await Profile.findOneAndUpdate(
-        { user: req.user.id },
-        { $set: profileFields },
-        { new: true, upsert: true }
-      );
+      let profile = await Profile.findOne({ user: req.user.id });
+
+      if (profile) {
+        // update
+        profile = await Profile.findOneAndUpdate(
+          { user: req.user.id },
+          { $set: profileFields },
+          { new: true }
+        );
+
+        return res.json(profile);
+      }
+
+      // Create
+      profile = new Profile(profileFields);
+      await profile.save();
       res.json(profile);
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server Error');
     }
-
-    // Build profile object
-
-    // const profileFields = {};
-
-    // profileFields.user = req.user.id;
-    // if (company) profileFields.company = company;
-    // if (website) profileFields.website = website;
-    // if (location) profileFields.location = location;
-    // if (bio) profileFields.bio = bio;
-    // if (status) profileFields.status = status;
-    // if (githubusername) profileFields.githubusername = githubusername;
-    // // if (skills) {
-    // //   profileFields.skills = skills.split(',').map((skill) => skill.trim());
-    // // }
-
-    // skills: Array.isArray(skills)
-    //   ? skills
-    //   : skills.split(',').map((skill) => ' ' + skill.trim()),
-    //   // Build social object
-    //   (profileFields.social = {});
-    // if (youtube) profileFields.social.youtube = youtube;
-    // if (twitter) profileFields.social.twitter = twitter;
-    // if (facebook) profileFields.social.facebook = facebook;
-    // if (linkedin) profileFields.social.linkedin = linkedin;
-    // if (instagram) profileFields.social.instagram = instagram;
-
-    // try {
-    //   let profile = await Profile.findOne({ user: req.user.id });
-
-    //   if (profile) {
-    //     // update
-    //     profile = await Profile.findOneAndUpdate(
-    //       { user: req.user.id },
-    //       { $set: profileFields },
-    //       { new: true }
-    //     );
-
-    //     return res.json(profile);
-    //   }
-
-    //   // Create
-    //   profile = new Profile(profileFields);
-    //   await profile.save();
-    //   res.json(profile);
-    // } catch (err) {
-    //   console.error(err.message);
-    //   res.status(500).send('Server Error');
-    // }
   }
 );
-
-// @route     GET api/profile
-// @desc      Get all profiles
-// @access    Public
-router.get('/', async (req, res) => {
-  try {
-    const profiles = await Profile.find().populate('user', ['name', 'avatar']);
-    res.json(profiles);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('server error');
-  }
-});
 
 // @route     GET api/profile/user/:user_id
 // @desc      Get profile by user ID
