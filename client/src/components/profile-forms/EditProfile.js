@@ -46,7 +46,7 @@ const EditProfile = ({
       youtube: loading || !profile.social ? '' : profile.social.youtube,
       instagram: loading || !profile.social ? '' : profile.social.instagram
     });
-  }, [loading, getCurrentProfile]);
+  }, [loading, getCurrentProfile, profile]);
 
   const {
     company,
@@ -75,8 +75,7 @@ const EditProfile = ({
     <Fragment>
       <h1 className='large text-primary'>Edit Your Profile</h1>
       <p className='lead'>
-        <i className='fas fa-user'></i> Let's get some information to make your
-        profile stand out
+        <i className='fas fa-user'></i> Add some changes to your profile
       </p>
       <small>* = required field</small>
       <form className='form' onSubmit={(e) => onSubmit(e)}>
@@ -101,7 +100,7 @@ const EditProfile = ({
             type='text'
             placeholder='Company'
             name='company'
-            value={company}
+            defaultValue={company}
             onChange={(e) => onChange(e)}
           />
           <small className='form-text'>
@@ -113,7 +112,7 @@ const EditProfile = ({
             type='text'
             placeholder='Website'
             name='website'
-            value={website}
+            defaultValue={website}
             onChange={(e) => onChange(e)}
           />
           <small className='form-text'>
@@ -125,7 +124,7 @@ const EditProfile = ({
             type='text'
             placeholder='Location'
             name='location'
-            value={location}
+            defaultValue={location}
             onChange={(e) => onChange(e)}
           />
           <small className='form-text'>
@@ -137,7 +136,7 @@ const EditProfile = ({
             type='text'
             placeholder='* Skills'
             name='skills'
-            value={skills}
+            defaultValue={skills}
             onChange={(e) => onChange(e)}
           />
           <small className='form-text'>
@@ -149,7 +148,7 @@ const EditProfile = ({
             type='text'
             placeholder='Github Username'
             name='githubusername'
-            value={githubusername}
+            defaultValue={githubusername}
             onChange={(e) => onChange(e)}
           />
           <small className='form-text'>
@@ -161,7 +160,7 @@ const EditProfile = ({
           <textarea
             placeholder='A short bio of yourself'
             name='bio'
-            value={bio}
+            defaultValue={bio}
             onChange={(e) => onChange(e)}
           ></textarea>
           <small className='form-text'>Tell us a little about yourself</small>
@@ -186,7 +185,7 @@ const EditProfile = ({
                 type='text'
                 placeholder='Twitter URL'
                 name='twitter'
-                value={twitter}
+                defaultValue={twitter}
                 onChange={(e) => onChange(e)}
               />
             </div>
@@ -197,7 +196,7 @@ const EditProfile = ({
                 type='text'
                 placeholder='Facebook URL'
                 name='facebook'
-                value={facebook}
+                defaultValue={facebook}
                 onChange={(e) => onChange(e)}
               />
             </div>
@@ -208,7 +207,7 @@ const EditProfile = ({
                 type='text'
                 placeholder='YouTube URL'
                 name='youtube'
-                value={youtube}
+                defaultValue={youtube}
                 onChange={(e) => onChange(e)}
               />
             </div>
@@ -219,7 +218,7 @@ const EditProfile = ({
                 type='text'
                 placeholder='Linkedin URL'
                 name='linkedin'
-                value={linkedin}
+                defaultValue={linkedin}
                 onChange={(e) => onChange(e)}
               />
             </div>
@@ -230,7 +229,7 @@ const EditProfile = ({
                 type='text'
                 placeholder='Instagram URL'
                 name='instagram'
-                value={instagram}
+                defaultValue={instagram}
                 onChange={(e) => onChange(e)}
               />
             </div>
